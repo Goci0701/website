@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GEMILANG - Game Matematika Lebih Senang</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Comic Sans MS', sans-serif;
+      background: linear-gradient(to bottom, #87CEFA, #ffffff);
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+    .sky {
+      position: fixed;
+      width: 100%;
+      height: 100vh;
+      z-index: -1;
+      overflow: hidden;
+    }
+    .cloud, .balloon {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.7;
+    }
+    .cloud {
+      width: 100px;
+      height: 60px;
+      background: white;
+      animation: cloudMove 60s linear infinite;
+    }
+    .cloud::before, .cloud::after {
+      content: '';
+      position: absolute;
+      background: white;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+    }
+    .cloud::before { top: -20px; left: 10px; }
+    .cloud::after { top: -10px; left: 40px; }
+    @keyframes cloudMove {
+      0% { left: -150px; }
+      100% { left: 110%; }
+    }
+    .balloon {
+      width: 30px;
+      height: 40px;
+      background: red;
+      animation: float 8s ease-in-out infinite;
+    }
+    @keyframes float {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-40px); }
+    }
+    .sun {
+      position: absolute;
+      top: 30px;
+      right: 50px;
+      width: 80px;
+      height: 80px;
+      background: yellow;
+      border-radius: 50%;
+      box-shadow: 0 0 30px yellow;
+      animation: spin 20s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg);}
+      100% { transform: rotate(360deg);}
+    }
+    .container {
+      max-width: 700px;
+      margin: 100px auto;
+      background-color: rgba(255, 255, 255, 0.9);
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+    h1 {
+      font-size: 28px;
+      color: #2e7d32;
+      margin-bottom: 10px;
+    }
+    h1 small {
+      display: block;
+      font-size: 18px;
+      color: #4caf50;
+    }
+    p {
+      font-size: 16px;
+      margin: 10px 0;
+    }
+    input {
+      width: 80%;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 16px;
+      border-radius: 10px;
+      border: 1px solid #aaa;
+    }
+    button {
+      background: #66bb6a;
+      color: white;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 25px;
+      margin: 10px 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    }
+    button:hover {
+      background: #43a047;
+    }
+    #question, #feedback, #score, #timer, #soalNomor {
+      font-size: 18px;
+      margin: 10px 0;
+      font-weight: bold;
+    }
+    #feedback { font-style: italic; }
+    #soalImg {
+      max-width: 150px;
+      height: auto;
+      display: none;
+      margin: 10px auto;
+      border-radius: 12px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.2);
+    }
+    @media (max-width: 600px) {
+      h1 { font-size: 22px; }
+      h1 small { font-size: 16px; }
+      p, input, button, #question, #feedback, #score, #timer {
+        font-size: 15px;
+      }
+      input { width: 90%; }
+      button { padding: 10px 15px; font-size: 14px; }
+      #soalImg { max-width: 120px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="sky">
+    <div class="sun"></div>
+    <div class="cloud" style="top: 50px; left: 0;"></div>
+    <div class="cloud" style="top: 120px; left: 200px;"></div>
+    <div class="cloud" style="top: 200px; left: 400px;"></div>
+    <div class="balloon" style="left: 20%; bottom: 30px;"></div>
+    <div class="balloon" style="left: 50%; bottom: 40px;"></div>
+    <div class="balloon" style="left: 70%; bottom: 20px;"></div>
+  </div>
+
+  <div class="container">
+    <h1>💡 GEMILANG 💡<br><small>Game Matematika Lebih Senang</small></h1>
+    <div id="inputNama">
+      <p>Game ini dibuat untuk siswa kelas 5 SD agar belajar matematika jadi seru!</p>
+      <p>Kerjakan <b>10 soal</b> tentang <b>bilangan cacah, KPK, FPB, faktor, kelipatan, dan soal cerita</b>.</p>
+      <p>Jawaban benar = +10 poin, salah = -5 poin. Kamu punya 30 detik tiap soal. Semangat!</p>
+      <p>Masukkan Nama:</p>
+      <input type="text" id="nama" placeholder="Nama Siswa" />
+      <br />
+      <button onclick="mulaiGame()">Mulai Game</button>
+    </div>
+
+    <div id="gameArea" style="display:none;">
+      <div id="soalNomor">Soal ke-1</div>
+      <div id="question"></div>
+      <img id="soalImg" src="" alt="Gambar Soal"/>
+      <button onclick="checkAnswer(true)">Ya</button>
+      <button onclick="checkAnswer(false)">Tidak</button>
+      <div id="feedback"></div>
+      <div id="timer">Waktu: 30 detik</div>
+      <div id="score">Skor: 0</div>
+    </div>
+
+    <div id="hasilAkhir" style="display:none;">
+      <h2>🎉 Permainan Selesai!</h2>
+      <p id="namaTampil"></p>
+      <p id="skorAkhir"></p>
+      <button onclick="resetGame()">Main Lagi</button>
+    </div>
+  </div>
+
+  <audio id="bgMusic" loop>
+    <source src="music.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    let score = 0, correctAnswer = false, timer, timeLeft = 30, soalKe = 1, totalSoal = 10, namaSiswa = "";
+    const bgMusic = document.getElementById("bgMusic");
+    function gcd(a,b){while(b)[a,b]=[b,a%b];return a;}
+    function lcm(a,b){return a*b/gcd(a,b);}
+    const soalList = [
+      (a,b) => [`Apakah ${a*b} kelipatan dari ${a}?`, true],
+      (a,b) => [`Apakah ${a} faktor dari ${a*b}?`, true],
+      (a,b) => [`Apakah ${a+b} faktor dari ${a*b}?`, (a*b)%(a+b)===0],
+      (a,b) => [`Apakah ${a} dan ${b} memiliki FPB lebih dari 1?`, gcd(a,b)>1],
+      (a,b) => [`Apakah KPK dari ${a} dan ${b} lebih besar dari 50?`, lcm(a,b)>50],
+      (a,b) => [`Apakah ${a+b} adalah bilangan cacah?`, a+b>=0],
+      (a,b) => [`Rina punya ${a*b} kue dan ingin membagikan ke ${a} teman. Apakah setiap teman dapat ${b} kue?`, true],
+      (a,b) => [`Ayah punya ${a} dus berisi ${b} botol. Apakah total botol adalah ${a*b}?`, true],
+      (a,b) => [`Ibu membeli ${a} kantong berisi ${b} apel. Apakah jumlah apel ${a*b}?`, true],
+      (a,b) => [`Di kebun ada ${a*b} jeruk, dibagi rata ke ${b} keranjang. Apakah tiap keranjang berisi ${a} jeruk?`, true],
+    ];
+    function mulaiGame(){
+      namaSiswa = document.getElementById("nama").value.trim();
+      if(!namaSiswa)return alert("Masukkan nama terlebih dahulu!");
+      document.getElementById("inputNama").style.display="none";
+      document.getElementById("gameArea").style.display="block";
+      score=0;soalKe=1;updateScore();bgMusic.play();generateQuestion();
+    }
+    function generateQuestion(){
+      const a=Math.floor(Math.random()*10)+2;
+      const b=Math.floor(Math.random()*10)+2;
+      const [text, answer]=soalList[Math.floor(Math.random()*soalList.length)](a,b);
+      correctAnswer=answer;
+      document.getElementById("soalNomor").textContent=`Soal ke-${soalKe}`;
+      document.getElementById("question").textContent=text;
+      document.getElementById("feedback").textContent="";
+      const soalImg = document.getElementById("soalImg");
+      soalImg.style.display = "none";
+      if(text.includes("kue")){
+        soalImg.src="kue.jpg";soalImg.style.display="block";
+      }else if(text.includes("botol")){
+        soalImg.src="botol.jpg";soalImg.style.display="block";
+      }else if(text.includes("apel")){
+        soalImg.src="apel.png";soalImg.style.display="block";
+      }else if(text.includes("jeruk")){
+        soalImg.src="jeruk.jpg";soalImg.style.display="block";
+      }
+      startTimer();
+    }
+    function startTimer(){
+      timeLeft=30;
+      document.getElementById("timer").textContent=`Waktu: ${timeLeft} detik`;
+      clearInterval(timer);
+      timer=setInterval(()=>{
+        timeLeft--;
+        document.getElementById("timer").textContent=`Waktu: ${timeLeft} detik`;
+        if(timeLeft<=0){
+          clearInterval(timer);
+          document.getElementById("feedback").textContent="⏰ Waktu habis! -5 poin";
+          document.getElementById("feedback").style.color="red";
+          score-=5;updateScore();
+          setTimeout(lanjutSoal,1000);
+        }
+      },1000);
+    }
+    function checkAnswer(userAnswer){
+      clearInterval(timer);
+      if(userAnswer===correctAnswer){
+        score+=10;
+        document.getElementById("feedback").textContent="Benar! +10 poin 🎉";
+        document.getElementById("feedback").style.color="green";
+      }else{
+        score-=5;
+        document.getElementById("feedback").textContent="Salah! -5 poin";
+        document.getElementById("feedback").style.color="red";
+      }
+      updateScore();
+      setTimeout(lanjutSoal,1000);
+    }
+    function updateScore(){
+      document.getElementById("score").textContent=`Skor: ${score}`;
+    }
+    function lanjutSoal(){
+      soalKe++;
+      if(soalKe>totalSoal){
+        selesaiGame();
+      }else{
+        generateQuestion();
+      }
+    }
+    function selesaiGame(){
+      document.getElementById("gameArea").style.display="none";
+      document.getElementById("hasilAkhir").style.display="block";
+      document.getElementById("namaTampil").textContent=`Nama: ${namaSiswa}`;
+      document.getElementById("skorAkhir").textContent=`Skor Akhir: ${score} dari 100`;
+      bgMusic.pause(); bgMusic.currentTime = 0;
+    }
+    function resetGame(){
+      document.getElementById("nama").value="";
+      document.getElementById("inputNama").style.display="block";
+      document.getElementById("hasilAkhir").style.display="none";
+    }
+  </script>
+</body>
+</html>
